@@ -66,7 +66,7 @@ module.exports = async (client) => {
         .setImage(img)
         .setTitle(`From reddit.com/r/${random}`)
         .setURL(`https://reddit.com/r/${random}`)
-        if (img.endsWith("mp4") || img.endsWith("gif")) {client.channel.cache.get("195553348835999745").send(img); return}
-        client.channel.cache.get("195553348835999745").send(embed)
+        if (img.endsWith("mp4") || img.endsWith("gif")) {client.guild.channels.cache.get("195553348835999745").send(img); return}
+        client.guild.channels.cache.getd("195553348835999745").send(embed)
     });
 };
