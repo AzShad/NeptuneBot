@@ -9,7 +9,7 @@ async function meme(interaction){
         const random = subReddits[Math.floor(Math.random() * subReddits.length)];
         const reddit = await fetch(`https://www.reddit.com/r/${random}/top/.json?sort=top&t=day`).then(res => res.json())
         const img = reddit.data.children[Math.floor(Math.random() * reddit.data.children.length)].data.url;
-        interaction.channel.send(img);
+        interaction.followUp(img);
     } catch (err) {console.log(err); {return "Try again"}}
 }
 

@@ -11,6 +11,7 @@ RUN npm install discord.js
 RUN npm install discord-together
 RUN npm install ms
 RUN npm install node-fetch@cjs
+RUN npm install node-schedule
 
 COPY . /usr/src/bot/
 
