@@ -50,23 +50,50 @@ module.exports = async (client) => {
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
     });
-    //daily meme
-    var schedule = require('node-schedule');
-    const job = schedule.scheduleJob('*/1 * * *', async function(client){
-    /*const job = schedule.scheduleJob('0 13 * * *', async function(){*/
-        const subReddits = ["meme","memes"];
-        const random = subReddits[Math.floor(Math.random() * subReddits.length)];
+    //log
+    /*client.on("voiceStateUpdate", (oldMember, newMember) => {
+        let oldV = oldMember.channel;
+        let newV = newMember.channel;
+        const guild = client.guilds.fetch(newMember.guild.id);
+        const log = guild.catch(chan => chan.name === "logs" && chan.type === "text");
+        if (!log) {return}
+        var embed = new Discord.MessageEmbed().setTitle("Connection Logs").setTimestamp()
+        .setThumbnail(client.users.cache.get(newMember.id).avatarURL({ dynamic: true, format: 'png', size: 64 }))
+    
+        if (oldV != newV) {
+            if (oldV == null) {
+                embed.setColor(colors.green)
+                .setDescription(`🔊${newMember.member} **joined\nchannel:** \`${newV.name}\``)
+            } else if (newV == null) {
+                embed.setColor(colors.red)
+                .setDescription(`${newMember.member} **left\nchannel:** \`${oldV.name}\``)
+                if (oldV.members.size == 0)
+                    try {client.botcommands.get('delete_channels').run(newMember.guild)} catch {}
+            } else {
+                embed.setColor(colors.yellow)
+                .setDescription(`💨${newMember.member} **moved\nfrom:** \`${oldV.name}\` **\nto:** \`${newV.name}\``)
+                if (oldV.members.size == 0)
+                    try {client.botcommands.get('delete_channels').run(newMember.guild)} catch {}
+            }
+            log.send({embeds: [embed]});
+        }
+    });*/
 
+    //daily meme
+    var cron = require('node-cron');
+    cron.schedule('0 13 * * *', async()  => {
+        const subReddits = ["meme", "memes"];
+        const random = subReddits[Math.floor(Math.random() * subReddits.length)];
         const reddit = await fetch(`https://www.reddit.com/r/${random}/top/.json?sort=top&t=day`).then(res => res.json())
         const img = reddit.data.children[Math.floor(Math.random() * reddit.data.children.length)].data.url;
 
         // const img = await random_search(random);
-        const embed = new Discord.MessageEmbed()
-        .setColor("00FF00")
-        .setImage(img)
-        .setTitle(`From reddit.com/r/${random}`)
-        .setURL(`https://reddit.com/r/${random}`)
-        if (img.endsWith("mp4") || img.endsWith("gif")) {client.guild.channels.cache.get("195553348835999745").send(img); return}
-        client.guild.cache.getd("195553348835999745").send(embed)
+        const embed = new MessageEmbed()
+            .setColor("00FF00")
+            .setImage(img)
+            .setTitle(`From reddit.com/r/${random}`)
+            .setURL(`https://reddit.com/r/${random}`)
+        if (img.endsWith("mp4") || img.endsWith("gif")) { client.channels.cache.get("195553348835999745").send(img); return }
+        client.channels.cache.get("195553348835999745").send({embeds: [embed]})
     });
 };
