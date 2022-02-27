@@ -15,5 +15,4 @@ require("./handler")(client);
 
 //Token
 require('dotenv').config({ path: './config/.env' })
-console.log(process.env.TOKEN);
 client.login(process.env.TOKEN);
