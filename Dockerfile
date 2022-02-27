@@ -1,15 +1,12 @@
 FROM node:latest
 
-RUN mkdir -p /usr/src/bot
-RUN mkdir -p /usr/src/bot
-WORKDIR /usr/src/bot
+RUN mkdir -p /app
+WORKDIR /app
 
-COPY package.json /usr/src/bot
+COPY . /app/
 
 RUN npm install
 
-COPY . /usr/src/bot/
-
-VOLUME [ "/usr/src/bot" ]
+VOLUME [ "/app" ]
 
 CMD ["node", "index.js"]
