@@ -31,7 +31,7 @@ module.exports ={
         interaction.channel.send({
             content: `Deleted ${filtered.size - 1} messages`,
         }).then((msg) => {
-            setTimeout(() => msg.delete(), ms('3 seconds'))
+            setTimeout(() => msg.delete(), ms('2 seconds'))
         })
     },
 };

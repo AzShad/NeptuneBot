@@ -1,8 +1,9 @@
 const { glob } = require("glob");
 const { promisify } = require("util");
-const { Client, Interaction } = require("discord.js");
+const { Client, Interaction, MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
 
+var cron = require('node-cron');
 const fetch = require("node-fetch");
 const globPromise = promisify(glob);
 
@@ -50,7 +51,24 @@ module.exports = async (client) => {
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
     });
-    //log
+
+
+    //daily meme
+    cron.schedule('0 13 * * *', async()  => {   
+        const subReddits = ["meme", "memes"];
+        const random = subReddits[Math.floor(Math.random() * subReddits.length)];
+        const reddit = await fetch(`https://www.reddit.com/r/${random}/top/.json?sort=top&t=day`).then(res => res.json())
+        const img = reddit.data.children[Math.floor(Math.random() * reddit.data.children.length)].data.url;
+        // const img = await random_search(random);
+        const embed = new MessageEmbed()
+            .setColor("00FF00")
+            .setImage(img)
+            .setTitle(`From reddit.com/r/${random}`)
+            .setURL(`https://reddit.com/r/${random}`)
+        if (img.endsWith("mp4") || img.endsWith("gif")) { client.channels.cache.get("195553348835999745").send(img); return }
+        client.channels.cache.get("195553348835999745").send({embeds: [embed]})
+    });
+        //log
     /*client.on("voiceStateUpdate", (oldMember, newMember) => {
         let oldV = oldMember.channel;
         let newV = newMember.channel;
@@ -78,22 +96,4 @@ module.exports = async (client) => {
             log.send({embeds: [embed]});
         }
     });*/
-
-    //daily meme
-    var cron = require('node-cron');
-    cron.schedule('0 13 * * *', async()  => {
-        const subReddits = ["meme", "memes"];
-        const random = subReddits[Math.floor(Math.random() * subReddits.length)];
-        const reddit = await fetch(`https://www.reddit.com/r/${random}/top/.json?sort=top&t=day`).then(res => res.json())
-        const img = reddit.data.children[Math.floor(Math.random() * reddit.data.children.length)].data.url;
-
-        // const img = await random_search(random);
-        const embed = new MessageEmbed()
-            .setColor("00FF00")
-            .setImage(img)
-            .setTitle(`From reddit.com/r/${random}`)
-            .setURL(`https://reddit.com/r/${random}`)
-        if (img.endsWith("mp4") || img.endsWith("gif")) { client.channels.cache.get("195553348835999745").send(img); return }
-        client.channels.cache.get("195553348835999745").send({embeds: [embed]})
-    });
 };
