@@ -3,6 +3,7 @@ const { promisify } = require("util");
 const { Client, Interaction, MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
 
+const colors = require("../colors.json");
 var cron = require('node-cron');
 const fetch = require("node-fetch");
 const globPromise = promisify(glob);
@@ -68,12 +69,12 @@ module.exports = async (client) => {
         if (img.endsWith("mp4") || img.endsWith("gif")) { client.channels.cache.get("195553348835999745").send(img); return }
         client.channels.cache.get("195553348835999745").send({embeds: [embed]})
     });
-        //log
-    /*client.on("voiceStateUpdate", (oldMember, newMember) => {
+    //log
+    client.on("voiceStateUpdate", (oldMember, newMember) => {
         let oldV = oldMember.channel;
         let newV = newMember.channel;
         const guild = client.guilds.fetch(newMember.guild.id);
-        const log = guild.catch(chan => chan.name === "logs" && chan.type === "text");
+        const log = guild.catch(channel => channel.name === "logs" && channel.type === "GUILD_TEXT");
         if (!log) {return}
         var embed = new Discord.MessageEmbed().setTitle("Connection Logs").setTimestamp()
         .setThumbnail(client.users.cache.get(newMember.id).avatarURL({ dynamic: true, format: 'png', size: 64 }))
@@ -85,15 +86,11 @@ module.exports = async (client) => {
             } else if (newV == null) {
                 embed.setColor(colors.red)
                 .setDescription(`${newMember.member} **left\nchannel:** \`${oldV.name}\``)
-                if (oldV.members.size == 0)
-                    try {client.botcommands.get('delete_channels').run(newMember.guild)} catch {}
             } else {
                 embed.setColor(colors.yellow)
                 .setDescription(`💨${newMember.member} **moved\nfrom:** \`${oldV.name}\` **\nto:** \`${newV.name}\``)
-                if (oldV.members.size == 0)
-                    try {client.botcommands.get('delete_channels').run(newMember.guild)} catch {}
             }
-            log.send({embeds: [embed]});
+            client.channels.cache.get("885840801769324554").send({embeds: [embed]});
         }
-    });*/
+    });
 };
