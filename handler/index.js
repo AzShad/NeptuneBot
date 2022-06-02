@@ -69,6 +69,11 @@ module.exports = async (client) => {
         if (img.endsWith("mp4") || img.endsWith("gif")) { client.channels.cache.get("195553348835999745").send(img); return }
         client.channels.cache.get("195553348835999745").send({embeds: [embed]})
     });
+
+    //cron.schedule('*/1 * * *', async()  => {   
+        
+    //});
+    
     //log
     client.on("voiceStateUpdate", (oldMember, newMember) => {
         let oldV = oldMember.channel;
