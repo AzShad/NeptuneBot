@@ -14,12 +14,6 @@ module.exports = {
             required: false
         }
     ],
-    /**
-     *
-     * @param {Client} client
-     * @param {Interaction} interaction
-     * @param {String[]} args
-     */
     run: async ({ interaction }) => {
         game.handleInteraction(interaction);
     },
