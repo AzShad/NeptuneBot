@@ -24,14 +24,6 @@ client.on("interactionCreate", async (interaction) => {
         cmd.run(client, interaction, args);
     }
 
-    /*if (interaction.isButton()){
-        if (interaction.customId === 'True'){
-            interaction.reply({ content: 'You clicked the true button'});
-        } else {
-            return interaction.reply({content: 'You clicked the false button'});
-        }
-    }*/
-
     // Context Menu Handling
     if (interaction.isContextMenu()) {
         await interaction.deferReply({ ephemeral: false });
@@ -39,3 +31,11 @@ client.on("interactionCreate", async (interaction) => {
         if (command) command.run(client, interaction);
     }
 });
+
+/*if (interaction.isButton()){
+        if (interaction.customId === 'True'){
+            interaction.reply({ content: 'You clicked the true button'});
+        } else {
+            return interaction.reply({content: 'You clicked the false button'});
+        }
+    }*/

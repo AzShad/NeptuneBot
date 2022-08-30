@@ -1,6 +1,6 @@
 const TicTacToe = require('discord-tictactoe');
-const { Interaction } = require('discord.js');
-const game = new TicTacToe({ language: "en"});
+const game = new TicTacToe({ language: "en", commandOptionName: 'user'});
+const discord = require("discord.js");
 
 module.exports = {
     name: "tictactoe",
@@ -8,13 +8,13 @@ module.exports = {
     type: "CHAT_INPUT",
     options: [
         {
-            name: 'opponent',
+            name: 'user',
             description: 'Who you want to play with',
             type: 'USER',
             required: false
         }
     ],
-    run: async ({ interaction }) => {
+    run: async (client, interaction ) => {
         game.handleInteraction(interaction);
     },
 };
