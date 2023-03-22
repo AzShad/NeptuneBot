@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: node16
+    - uses: actions/checkout@v2
     - name: Build the Docker
       run: docker build -t azshad/novabot .
     - name: Push the Docker
