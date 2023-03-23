@@ -48,6 +48,7 @@ module.exports = async (client) => {
         await client.guilds.cache
             .get("195553348835999745")
             .commands.set(arrayOfSlashCommands);
+        setInterval(checkUpcomingLaunches, 86400000)
 
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
@@ -98,4 +99,47 @@ module.exports = async (client) => {
             client.channels.cache.get("885840801769324554").send({embeds: [embed]});
         }
     });
+    const CHANNEL_ID = '869668082694635531';
+
+    // Fonction pour récupérer les lancements de fusée à venir
+    async function getUpcomingLaunches() {
+      const response = await fetch(`https://launchlibrary.net/1.4/launch?startdate=${getCurrentDate()}&enddate=${getFutureDate()}&limit=10`);
+      const data = await response.json();
+      return data.launches;
+    }
+    
+    // Fonction pour obtenir la date actuelle en format YYYY-MM-DD
+    function getCurrentDate() {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = currentDate.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Fonction pour obtenir la date dans 24 heures en format YYYY-MM-DD
+    function getFutureDate() {
+      const futureDate = new Date(Date.now() + 86400000); // Ajoute 24 heures en millisecondes
+      const year = futureDate.getFullYear();
+      const month = (futureDate.getMonth() + 1).toString().padStart(2, '0');
+      const day = futureDate.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    
+    // Fonction pour envoyer les messages de lancement de fusée dans le canal prédéfini
+    async function sendLaunchMessages(launches) {
+      const channel = client.channels.cache.get(CHANNEL_ID);
+      for (const launch of launches) {
+        const message = `Le lancement de ${launch.name} est prévu pour le ${launch.net} (${launch.location.name})`;
+        await channel.send(message);
+      }
+    }
+    
+    // Fonction pour vérifier s'il y a des lancements de fusée à venir dans 24 heures
+    async function checkUpcomingLaunches() {
+      const launches = await getUpcomingLaunches();
+      if (launches.length > 0) {
+        await sendLaunchMessages(launches);
+      }
+    }
 };
