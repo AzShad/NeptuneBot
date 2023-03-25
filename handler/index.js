@@ -2,6 +2,7 @@ const { glob } = require("glob");
 const { promisify } = require("util");
 const { Client, Interaction, MessageEmbed } = require("discord.js");
 const Discord = require("discord.js");
+const axios = require('axios');
 
 const colors = require("../colors.json");
 var cron = require('node-cron');
@@ -48,10 +49,16 @@ module.exports = async (client) => {
         await client.guilds.cache
             .get("195553348835999745")
             .commands.set(arrayOfSlashCommands);
-        setInterval(checkUpcomingLaunches, 86400000)
-
         // Register for all the guilds the bot is in
         // await client.application.commands.set(arrayOfSlashCommands);
+
+        // Appel initial pour vérifier les lancements
+        checkAndSendLaunches(client);
+
+        // Vérifier les lancements toutes les heures
+        setInterval(() => {
+          checkAndSendLaunches(client);
+        }, 1000 * 60 * 60);
     });
 
 
@@ -98,48 +105,64 @@ module.exports = async (client) => {
             }
             client.channels.cache.get("885840801769324554").send({embeds: [embed]});
         }
-    });
-    const CHANNEL_ID = '869668082694635531';
-
-    // Fonction pour récupérer les lancements de fusée à venir
-    async function getUpcomingLaunches() {
-      const response = await fetch(`https://launchlibrary.net/1.4/launch?startdate=${getCurrentDate()}&enddate=${getFutureDate()}&limit=10`);
-      const data = await response.json();
-      return data.launches;
-    }
-    
+    });  
     // Fonction pour obtenir la date actuelle en format YYYY-MM-DD
-    function getCurrentDate() {
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-      const day = currentDate.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-    
-    // Fonction pour obtenir la date dans 24 heures en format YYYY-MM-DD
-    function getFutureDate() {
-      const futureDate = new Date(Date.now() + 86400000); // Ajoute 24 heures en millisecondes
-      const year = futureDate.getFullYear();
-      const month = (futureDate.getMonth() + 1).toString().padStart(2, '0');
-      const day = futureDate.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-    
-    // Fonction pour envoyer les messages de lancement de fusée dans le canal prédéfini
-    async function sendLaunchMessages(launches) {
-      const channel = client.channels.cache.get(CHANNEL_ID);
-      for (const launch of launches) {
-        const message = `Le lancement de ${launch.name} est prévu pour le ${launch.net} (${launch.location.name})`;
-        await channel.send(message);
-      }
-    }
-    
-    // Fonction pour vérifier s'il y a des lancements de fusée à venir dans 24 heures
-    async function checkUpcomingLaunches() {
-      const launches = await getUpcomingLaunches();
-      if (launches.length > 0) {
-        await sendLaunchMessages(launches);
-      }
-    }
 };
+
+//Send Launch activity 24h before
+
+const channelId = '869668082694635531'; // Remplacez par l'ID du channel où vous souhaitez envoyer les notifications
+const displayedLaunchIds = new Set();
+
+async function getUpcomingLaunches(retryCount = 0) {
+  const maxRetries = 5; // Maximum de tentatives de réessai
+  const retryDelay = 1000; // Délai de base en millisecondes pour les réessais
+
+  try {
+    const currentDate = new Date().toISOString();
+    const response = await axios.get(`https://ll.thespacedevs.com/2.0.0/launch/upcoming?limit=5&net__gte=${currentDate}`);
+    return response.data.results;
+  } catch (error) {
+    if (error.response && error.response.status === 429 && retryCount < maxRetries) {
+      // Attente exponentielle pour réessayer
+      const delay = retryDelay * Math.pow(2, retryCount);
+      console.warn(`Erreur 429 : Trop de requêtes. Réessai dans ${delay} ms...`);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
+      // Réessai après le délai
+      return getUpcomingLaunches(retryCount + 1);
+    } else {
+      console.error(error);
+    }
+  }
+}
+
+function formatLaunchMessage(launch) {
+  const embed = new Discord.MessageEmbed()
+    .setColor('#0099ff')
+    .setTitle(launch.name)
+    .setURL(launch.url)
+    .addFields(
+      { name: 'Date de lancement', value: launch.net },
+      { name: 'Agence', value: launch.launch_service_provider.name },
+    );
+
+  return embed;
+}
+
+async function checkAndSendLaunches(client) {
+  const launches = await getUpcomingLaunches();
+  const channel = await client.channels.fetch(channelId);
+
+  for (const launch of launches) {
+    const now = new Date();
+    const launchDate = new Date(launch.net);
+    const diffHours = (launchDate - now) / (1000 * 60 * 60);
+
+    if (diffHours <= 72 && diffHours > 0 && !displayedLaunchIds.has(launch.id)) {
+      const message = formatLaunchMessage(launch);
+      channel.send({ embeds: [message] });
+      displayedLaunchIds.add(launch.id); // Ajouter l'ID du lancement au Set
+    }
+  }
+}
