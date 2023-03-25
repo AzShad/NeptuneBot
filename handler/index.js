@@ -159,7 +159,7 @@ async function checkAndSendLaunches(client) {
     const launchDate = new Date(launch.net);
     const diffHours = (launchDate - now) / (1000 * 60 * 60);
 
-    if (diffHours <= 72 && diffHours > 0 && !displayedLaunchIds.has(launch.id)) {
+    if (diffHours <= 24 && diffHours > 0 && !displayedLaunchIds.has(launch.id)) {
       const message = formatLaunchMessage(launch);
       channel.send({ embeds: [message] });
       displayedLaunchIds.add(launch.id); // Ajouter l'ID du lancement au Set
