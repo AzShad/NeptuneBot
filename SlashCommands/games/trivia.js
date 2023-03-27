@@ -1,12 +1,15 @@
 const { Client, Intents, MessageActionRow, MessageButton } = require('discord.js');
 const axios = require('axios');
 const he = require('he');
+const DiscordJS = require('discord.js');
 
-module.exports ={
-    name: "trivia",
-    description: "Answer to some questions",
-
-    run: async(client,interaction) => {
+module.exports = {
+    test: true,
+    data: new DiscordJS.SlashCommandBuilder()
+      .setName('trivia')
+      .setDescription('Answer to some questions'),
+      
+    async execite({interaction}){
         try {
             const response = await axios.get('https://opentdb.com/api.php?amount=1&type=boolean');
             const question = response.data.results[0];
@@ -23,7 +26,7 @@ module.exports ={
                   .setStyle('DANGER')
               );
       
-            await interaction.followUp({
+            await interaction.reply({
                 content: `**Question: ${he.decode(question.question)}**\nAnswer to the question with the button under.`,
                 components: [row],
                 ephemeral: false,
@@ -49,7 +52,7 @@ module.exports ={
       
           } catch (error) {
             console.error(error);
-            await interaction.followUp({ content: 'Error. please try again later.', ephemeral: true });
+            await interaction.reply({ content: 'Error. please try again later.', ephemeral: true });
           }
     },
 };
