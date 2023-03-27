@@ -1,6 +1,7 @@
 const { glob } = require("glob");
 const { promisify } = require("util");
-const { Client, Interaction, MessageEmbed } = require("discord.js");
+const fs = require("fs");
+const { Client, Interaction, EmbedBuilder, Collection, Intents } = require("discord.js");
 const Discord = require("discord.js");
 const axios = require('axios');
 
@@ -69,7 +70,7 @@ module.exports = async (client) => {
         const reddit = await fetch(`https://www.reddit.com/r/${random}/top/.json?sort=top&t=day`).then(res => res.json())
         const img = reddit.data.children[Math.floor(Math.random() * reddit.data.children.length)].data.url;
         // const img = await random_search(random);
-        const embed = new MessageEmbed()
+        const embed = new EmbedBuilder()
             .setColor("00FF00")
             .setImage(img)
             .setTitle(`From reddit.com/r/${random}`)
@@ -89,8 +90,10 @@ module.exports = async (client) => {
         const guild = client.guilds.fetch(newMember.guild.id);
         const log = guild.catch(channel => channel.name === "logs" && channel.type === "GUILD_TEXT");
         if (!log) {return}
-        var embed = new Discord.MessageEmbed().setTitle("Connection Logs").setTimestamp()
-        .setThumbnail(client.users.cache.get(newMember.id).avatarURL({ dynamic: true, format: 'png', size: 64 }))
+        var embed = new EmbedBuilder()
+          .setTitle("Connection Logs")
+          .setTimestamp()
+          .setThumbnail(client.users.cache.get(newMember.id).avatarURL({ dynamic: true, format: 'png', size: 64 }))
     
         if (oldV != newV) {
             if (oldV == null) {
@@ -138,7 +141,7 @@ async function getUpcomingLaunches(retryCount = 0) {
 }
 
 function formatLaunchMessage(launch) {
-  const embed = new Discord.MessageEmbed()
+  const embed = new EmbedBuilder()
     .setColor('#0099ff')
     .setTitle(launch.name)
     .setURL(launch.url)

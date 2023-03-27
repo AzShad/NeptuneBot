@@ -1,4 +1,4 @@
-const types = require("../../arg_type.json");
+/*const types = require("../../arg_type.json");
 const { 
     Client, 
     Message,
@@ -32,11 +32,11 @@ async function meme(message, interaction){
     } catch (err) {console.log(err); {return "Try again"}}
 }
 
-/*async function spacenews(interaction){
+async function spacenews(interaction){
     try{
         
     } catch (err) {console.log(err); {return "Try again"}}
-}*/
+}
 
 module.exports = {
      name: "setup",
@@ -59,12 +59,6 @@ module.exports = {
             ],
          },
      ],
-     /**
-     *
-     * @param {Client} client
-     * @param {Message} interaction
-     * @param {String[]} args
-     */
      run: async (client, message, interaction) => {
         try {
             const choices = interaction.options.getString("type");
@@ -77,4 +71,4 @@ module.exports = {
         } catch (e) {console.log(e); return "Oups, I can't do that"}
      },
 
-}
+}*/

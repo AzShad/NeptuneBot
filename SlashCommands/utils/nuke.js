@@ -1,37 +1,25 @@
 const ms = require("ms");
+const DiscordJS = require('discord.js');
 
-module.exports ={
-    name: "nuke",
-    description: "Delete messages",
-    userPermissions: ["MANAGE_MESSAGES"],
-    options: [
-        {
-            name: "amount",
-            description: "amount of messages that is gonna be deleted ",
-            type: "INTEGER",
-            required: true,
-        },
-    ],
+module.exports = {
+    test: true,
+    data: new DiscordJS.SlashCommandBuilder()
+        .setName('nuke')
+        .setDescription('Delete multiple messages')
+        .setDMPermission(false)
+        .addIntegerOption(option => option
+            .setName('number')
+            .setDescription('How many you want to nuke')
+            .setRequired(false)
+            .setMinValue(1)
+            .setMaxValue(100))
+        .setDefaultMemberPermissions(DiscordJS.PermissionFlagsBits.ManageMessages),
 
-    run: async(client,interaction) => {
-        const amount = interaction.options.getInteger('amount');
-
-        if (amount > 100) 
-            return interaction.followUp({
-                content:
-                    "The maximum amount of messages you can ddelete is 10 messages",
-            });
-        const messages = await interaction.channel.messages.fetch({
-            limit: amount + 1,
-        });
-        const filtered = messages.filter(
-            (msg) => Date.now() - msg.createdTimestamp < ms('14 days')
-        );
-        await interaction.channel.bulkDelete(filtered)
-        interaction.channel.send({
-            content: `Deleted ${filtered.size - 1} messages`,
-        }).then((msg) => {
-            setTimeout(() => msg.delete(), ms('2 seconds'))
-        })
+    async execute({interaction, options}){
+        try {
+            let number = options[0] ? options[0].value : 100;
+            await interaction.member.guild.channels.cache.get(interaction.channelId).bulkDelete(number, true)
+            .then(del => interaction.reply({content: `Deleted ${del.size} messages.`, ephemeral: true}));
+        } catch (e) {console.error('Error in /nuke:', e)}
     },
 };
