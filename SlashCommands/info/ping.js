@@ -1,16 +1,14 @@
 const { Client, CommandInteraction } = require("discord.js");
+const DiscordJS = require('discord.js');
 
 module.exports = {
-    name: "ping",
-    description: "returns websocket ping",
-    type: 'CHAT_INPUT',
-    /**
-     *
-     * @param {Client} client
-     * @param {CommandInteraction} interaction
-     * @param {String[]} args
-     */
-    run: async (client, interaction, args) => {
-        interaction.followUp({ content: `${client.ws.ping}ms!` });
+    test: true,
+    data: new DiscordJS.SlashCommandBuilder()
+      .setName('ping')
+      .setDescription('returns websocket ping'),
+      
+    async execute({client, interaction}){
+      await interaction.deferReply();
+      await interaction.editReply({ content: `${client.ws.ping}ms!` });
     },
 };

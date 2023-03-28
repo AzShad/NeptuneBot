@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
-const { MessageEmbed } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
+const DiscordJS = require('discord.js');
 const axios = require('axios');
 
 async function getUpcomingLaunches() {
@@ -11,7 +12,7 @@ async function getUpcomingLaunches() {
 }
   
 function createLaunchEmbed(launches) {
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle('Prochains lancements de fusées')
       .setURL('https://thespacedevs.com/ll')
@@ -29,13 +30,15 @@ function createLaunchEmbed(launches) {
     return embed;
   }
 
-module.exports ={
-    name: "schedule",
-    description: "Show the next schedule launch",
+module.exports = {
+  test: true,
+  data: new DiscordJS.SlashCommandBuilder()
+    .setName('schedule')
+    .setDescription('Show the next schedule launch'),
 
-    run: async(client, interaction, args) => {
-        const launches = await getUpcomingLaunches();
-        const embed = createLaunchEmbed(launches);
-        await interaction.followUp({ embeds: [embed] });
-    },
+    async execute({client, interaction}){
+    const launches = await getUpcomingLaunches();
+    const embed = createLaunchEmbed(launches);
+    await interaction.reply({ embeds: [embed] });
+  },
 };
