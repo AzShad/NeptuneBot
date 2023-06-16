@@ -34,7 +34,7 @@ module.exports = {
   test: true,
   data: new DiscordJS.SlashCommandBuilder()
     .setName('schedule')
-    .setDescription('Show the next schedule launch'),
+    .setDescription('Show the next schedule launch !'),
 
     async execute({client, interaction}){
     const launches = await getUpcomingLaunches();
