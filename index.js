@@ -39,7 +39,7 @@ client.on("ready", async () => {
     loadCommands("./SlashCommands");
 
     //daily meme
-    cron.schedule('0 13 * * *', async () => {
+    cron.schedule('0 20 * * *', async () => {
         const options = '195553348835999745'
         client.commands.get('meme').execute({ client, options })
     });
