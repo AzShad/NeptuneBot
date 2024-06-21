@@ -186,19 +186,23 @@ function formatLaunchMessage(launch) {
 }
 
 async function checkAndSendLaunches(client) {
-  const launches = await getUpcomingLaunches();
-  const channel = await client.channels.fetch(channelId);
+  try{
+    const launches = await getUpcomingLaunches();
+    const channel = await client.channels.fetch(channelId);
 
-  for (const launch of launches) {
-    const now = new Date();
-    const launchDate = new Date(launch.net);
-    const diffHours = (launchDate - now) / (1000 * 60 * 60);
+    for (const launch of launches) {
+      const now = new Date();
+      const launchDate = new Date(launch.net);
+      const diffHours = (launchDate - now) / (1000 * 60 * 60);
 
-    if (diffHours <= 24 && diffHours > 0 && !displayedLaunchIds.has(launch.id)) {
-      const message = formatLaunchMessage(launch);
-      channel.send({ embeds: [message] });
-      displayedLaunchIds.add(launch.id); // Ajouter l'ID du lancement au Set
+      if (diffHours <= 24 && diffHours > 0 && !displayedLaunchIds.has(launch.id)) {
+        const message = formatLaunchMessage(launch);
+        channel.send({ embeds: [message] });
+        displayedLaunchIds.add(launch.id); // Ajouter l'ID du lancement au Set
+      }
     }
+  } catch(error) {
+    console.error(error);
   }
 }
 
